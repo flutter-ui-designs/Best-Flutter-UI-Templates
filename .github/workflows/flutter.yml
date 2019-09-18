@@ -17,10 +17,10 @@ jobs:
         channel: 'dev' # or: 'dev' or 'beta'
     - name: Build apk
       working-directory: ./best_flutter_ui_templates
-    -run: flutter config --enable-web
-    -run: flutter pub get 
-    -run: flutter build apk 
-    -run: flutter build web
+    - run: flutter config --enable-web
+    - run: flutter pub get 
+    - run: flutter build apk 
+    - run: flutter build web
     - uses: actions/upload-artifact@master 
       with: 
         name: best_flutter_ui_templates
