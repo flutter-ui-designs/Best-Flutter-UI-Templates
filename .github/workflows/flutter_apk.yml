@@ -15,8 +15,9 @@ jobs:
     - uses: subosito/flutter-action@v1 
       with: 
         channel: 'stable' # or: 'dev' or 'beta'
+    - name: build apk
       working-directory: ./best_flutter_ui_templates
-    - run: |
+      run: |
         flutter pub get 
         flutter build apk 
     - uses: actions/upload-artifact@master 
