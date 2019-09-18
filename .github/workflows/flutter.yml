@@ -24,4 +24,4 @@ jobs:
       with: 
         working-directory: ./best_flutter_ui_templates
         name: Apk
-        path: ./build/app/outputs/apk/release/
+        path: ./android/app/src/debug/build/app/outputs/apk/release/
