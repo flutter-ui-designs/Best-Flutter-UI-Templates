@@ -1,4 +1,4 @@
-name: Flutter CI
+name: Flutter web CI
 
 on: [push]
 
@@ -20,7 +20,6 @@ jobs:
       run: |
         flutter config --enable-web
         flutter pub get 
-        flutter build apk 
         flutter build web
     - uses: actions/upload-artifact@master 
       with: 
