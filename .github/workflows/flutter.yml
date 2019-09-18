@@ -14,13 +14,14 @@ jobs:
         java-version: '12.x' 
     - uses: subosito/flutter-action@v1 
       with: 
-        channel: 'stable' # or: 'dev' or 'beta'
+        channel: 'dev' # or: 'dev' or 'beta'
     - name: Build apk
       working-directory: ./best_flutter_ui_templates
-      run: |
-        flutter pub get 
-        flutter build apk 
+    -run: flutter config --enable-web
+    -run: flutter pub get 
+    -run: flutter build apk 
+    -run: flutter build web
     - uses: actions/upload-artifact@master 
       with: 
-        name: Apk
-        path: best_flutter_ui_templates/build/app/outputs/apk/release/
+        name: best_flutter_ui_templates
+        path: best_flutter_ui_templates/
