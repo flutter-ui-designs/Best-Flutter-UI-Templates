@@ -18,6 +18,7 @@ jobs:
     - name: Build
       working-directory: ./best_flutter_ui_templates
       run: |
+        flutter channel master
         flutter config --enable-web
         flutter pub get 
         flutter build web
