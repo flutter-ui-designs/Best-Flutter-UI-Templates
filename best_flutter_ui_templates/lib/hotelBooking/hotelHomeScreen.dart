@@ -1,8 +1,11 @@
+import 'dart:ui';
+import 'package:best_flutter_ui_templates/hotelBooking/calendarPopupView.dart';
 import 'package:best_flutter_ui_templates/hotelBooking/hotelListView.dart';
 import 'package:best_flutter_ui_templates/hotelBooking/model/hotelListData.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'package:intl/intl.dart';
+import 'filtersScreen.dart';
 import 'hotelAppTheme.dart';
 
 class HotelHomeScreen extends StatefulWidget {
@@ -14,6 +17,9 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
   AnimationController animationController;
   var hotelList = HotelListData.hotelList;
   ScrollController _scrollController = new ScrollController();
+
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now().add(Duration(days: 5));
 
   @override
   void initState() {
@@ -38,65 +44,69 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
       data: HotelAppTheme.buildLightTheme(),
       child: Container(
         child: Scaffold(
-          body: InkWell(
-            splashColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            onTap: () {
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            child: Column(
-              children: <Widget>[
-                getAppBarUI(),
-                Expanded(
-                  child: NestedScrollView(
-                    controller: _scrollController,
-                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                      return <Widget>[
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                            return Column(
-                              children: <Widget>[
-                                getSearchBarUI(),
-                                getTimeDateUI(),
-                              ],
-                            );
-                          }, childCount: 1),
-                        ),
-                        SliverPersistentHeader(
-                          pinned: true,
-                          floating: true,
-                          delegate: ContestTabHeader(
-                            getFilterBarUI(),
+          body: Stack(
+            children: <Widget>[
+              InkWell(
+                splashColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                },
+                child: Column(
+                  children: <Widget>[
+                    getAppBarUI(),
+                    Expanded(
+                      child: NestedScrollView(
+                        controller: _scrollController,
+                        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                          return <Widget>[
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                                return Column(
+                                  children: <Widget>[
+                                    getSearchBarUI(),
+                                    getTimeDateUI(),
+                                  ],
+                                );
+                              }, childCount: 1),
+                            ),
+                            SliverPersistentHeader(
+                              pinned: true,
+                              floating: true,
+                              delegate: ContestTabHeader(
+                                getFilterBarUI(),
+                              ),
+                            ),
+                          ];
+                        },
+                        body: Container(
+                          color: HotelAppTheme.buildLightTheme().backgroundColor,
+                          child: ListView.builder(
+                            itemCount: hotelList.length,
+                            padding: EdgeInsets.only(top: 8),
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              var count = hotelList.length > 10 ? 10 : hotelList.length;
+                              var animation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+                                  parent: animationController, curve: Interval((1 / count) * index, 1.0, curve: Curves.fastOutSlowIn)));
+                              animationController.forward();
+                              return HotelListView(
+                                callback: () {},
+                                hotelData: hotelList[index],
+                                animation: animation,
+                                animationController: animationController,
+                              );
+                            },
                           ),
                         ),
-                      ];
-                    },
-                    body: Container(
-                      color: HotelAppTheme.buildLightTheme().backgroundColor,
-                      child: ListView.builder(
-                        itemCount: hotelList.length,
-                        padding: EdgeInsets.only(top: 8),
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) {
-                          var count = hotelList.length > 10 ? 10 : hotelList.length;
-                          var animation = Tween(begin: 0.0, end: 1.0).animate(
-                              CurvedAnimation(parent: animationController, curve: Interval((1 / count) * index, 1.0, curve: Curves.fastOutSlowIn)));
-                          animationController.forward();
-                          return HotelListView(
-                            callback: () {},
-                            hotelData: hotelList[index],
-                            animation: animation,
-                            animationController: animationController,
-                          );
-                        },
                       ),
-                    ),
-                  ),
-                )
-              ],
-            ),
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -192,6 +202,10 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
                     ),
                     onTap: () {
                       FocusScope.of(context).requestFocus(FocusNode());
+                      // setState(() {
+                      //   isDatePopupOpen = true;
+                      // });
+                      showDemoDialog(context: context);
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
@@ -207,7 +221,7 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
                             height: 8,
                           ),
                           Text(
-                            "12 Dec - 22 Dec",
+                            "${DateFormat("dd, MMM").format(startDate)} - ${DateFormat("dd, MMM").format(endDate)}",
                             style: TextStyle(
                               fontWeight: FontWeight.w100,
                               fontSize: 16,
@@ -391,6 +405,10 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
                     ),
                     onTap: () {
                       FocusScope.of(context).requestFocus(FocusNode());
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => FiltersScreen(), fullscreenDialog: true),
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
@@ -425,6 +443,28 @@ class _HotelHomeScreenState extends State<HotelHomeScreen> with TickerProviderSt
           ),
         )
       ],
+    );
+  }
+
+  void showDemoDialog({BuildContext context}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => CalendarPopupView(
+        barrierDismissible: true,
+         minimumDate: DateTime.now(),
+        //  maximumDate: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day + 10),
+        initialEndDate: endDate,
+        initialStartDate: startDate,
+        onApplyClick: (DateTime startData, DateTime endData) {
+          setState(() {
+            if (startData != null && endData != null) {
+              startDate = startData;
+              endDate = endData;
+            }
+          });
+        },
+        onCancelClick: () {},
+      ),
     );
   }
 
